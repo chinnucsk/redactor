@@ -24,13 +24,57 @@
 -module(redactor).
 
 
+%% otp callbacks
+-export([start/2, start/0, stop/1, init/1, terminate/2]).
+-export([redactor_profiles/0]).
+%% bash script entry point
 -export([red/0]).
 
 
+%% application machinery
+start() -> application:start(redactor).
+
+start(_Type, _Args) -> redactor_supervisor().
+
+stop(_State) -> ok.
+
+%% application internals
+redactor_supervisor() -> supervisor:start_link(redactor, {supervisor, []}).
+
+redactor_profiles() ->
+    gen_server:start_link({local, redactor_profiles}, redactor, {redactor_profiles, []}, []).
+
+%% don't do this
+init({supervisor, _Args}) ->
+    {ok, {
+        {one_for_one, 1, 5},
+        [{profiles, {?MODULE, redactor_profiles, []}, permanent, brutal_kill, worker, [?MODULE]}]
+    }};
+init({redactor_profiles, _Args}) ->
+    {ok, gb_trees:empty()}.
+
+terminate(_, _) -> ok.
+
+
+%% let's not get crazy! for now just print out the args to `red' and halt
 red() -> io:format("~p~n", [init:get_plain_arguments()]), halt(0).
 
 
 
 -ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
+
+tty(OnOff) -> error_logger:tty(OnOff).
+
+
+application_start_test_() ->
+    {setup, fun() -> tty(false) end, fun(_) -> application:stop(redactor), tty(true) end, [
+        {"application starts cleanly", ?_assertEqual(ok, application:start(redactor))}
+    ]}.
+
+application_stop_test_() ->
+    {setup, fun() -> tty(false), application:start(redactor) end, fun(_) -> tty(true) end, [
+        {"application stops cleanly", ?_assertEqual(ok, application:stop(redactor))}
+    ]}.
+
 -endif.

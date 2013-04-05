@@ -2,7 +2,8 @@
     {description, "a release oriented build tool for erlang"},
     {vsn, "0.1"},
     {modules, []},
-    {registered, []},
+    {registered, [redactor_profiles]},
     {applications, [kernel, stdlib]},
+		{mod, {redactor,[]}},
     {env, []}
 ]}.
