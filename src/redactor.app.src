@@ -1,0 +1,8 @@
+{application, redactor, [
+    {description, "a release oriented build tool for erlang"},
+    {vsn, "0.1"},
+    {modules, []},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {env, []}
+]}.
