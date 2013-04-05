@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+
+
 if [ -z $1 ]; then
-  exec erl -run redactor run help -noinput
+  exec erl -run redactor red -noinput -extra help
 fi
 
-exec erl -run redactor run "$@" -noinput
+exec erl -run redactor red -noinput -extra "$@"

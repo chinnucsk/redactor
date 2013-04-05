@@ -24,9 +24,11 @@
 -module(redactor).
 
 
--export([run/1]).
+-export([red/0]).
 
-run(CmdArgs) -> io:format("~p~n", [CmdArgs]), erlang:halt(0).
+
+red() -> io:format("~p~n", [init:get_plain_arguments()]), halt(0).
+
 
 
 -ifdef(TEST).
